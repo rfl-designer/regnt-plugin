@@ -1,0 +1,5 @@
+{
+  "name": "regnt",
+  "description": "Plugin com skills e workflows para desenvolvimento com o SoloBoard. Inclui workflow estruturado de 5 fases (Intake, Planejamento, Implementacao, Qualidade, Entrega) integrado ao SoloBoard MCP.",
+  "version": "1.0.0"
+}

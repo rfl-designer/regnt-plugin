@@ -1,0 +1,17 @@
+{
+  "name": "regnt-marketplace",
+  "owner": {
+    "name": "Rafael Oliveira"
+  },
+  "metadata": {
+    "description": "Marketplace de plugins para desenvolvimento com SoloBoard"
+  },
+  "plugins": [
+    {
+      "name": "regnt",
+      "source": "./plugins/regnt",
+      "description": "Skills e workflows para desenvolvimento com o SoloBoard",
+      "version": "1.0.0"
+    }
+  ]
+}
