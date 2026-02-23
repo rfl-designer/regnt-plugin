@@ -7,6 +7,7 @@ skills:
   - livewire-development
   - fluxui-development
   - tailwindcss-development
+  - pint-formatting
 ---
 
 # Frontend Laravel Specialist

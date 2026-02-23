@@ -4,8 +4,8 @@ description: Especialista em workflows de inteligência artificial com Laravel A
 tools: Read, Edit, Write, Glob, Grep, Bash, Task
 model: sonnet
 skills:
-  - ai-development
   - mcp-development
+  - php-development
 ---
 
 # AI Workflows Specialist
