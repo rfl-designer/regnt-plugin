@@ -38,96 +38,93 @@ Depois:
 
 ## Fase 2: Planejamento
 
-### Passo 1: Entrar no Plan Mode
+Invocar o agente `Plan` passando o contexto completo da task e o template do plano.
 
-Chamar a ferramenta `EnterPlanMode` para iniciar o modo de planejamento estruturado:
-
-```
-Ferramenta: EnterPlanMode
-Parâmetros: {} (nenhum parâmetro necessário)
-```
-
-O Plan Mode permite explorar o codebase sistematicamente usando Glob, Grep e Read antes de implementar.
-
-### Passo 2: Explorar e Documentar
-
-Dentro do Plan Mode, explorar o código existente e criar o plano seguindo o template abaixo.
-O plano será salvo em um arquivo (por padrão em `~/.claude/plans/` ou conforme `plansDirectory` nas settings).
-
-### Template do Plano
-
-```markdown
-# Plano: {titulo-da-task}
-
-## 1. Contexto
-- Task ID: {id}
-- Descrição: {resumo da task}
-- Documentos consultados: {lista de docs lidos}
-
-## 2. Análise do Código Existente
-- Models relacionados: {lista com paths}
-- Componentes Livewire: {lista}
-- Policies/Gates: {lista}
-- Migrations relevantes: {lista}
-
-## 3. Arquitetura Proposta
-
-### 3.1 Migration + Model
-- [ ] {arquivo}: {descrição do que criar/modificar}
-
-### 3.2 Policy / Authorization
-- [ ] {arquivo}: {descrição}
-
-### 3.3 Action / Service
-- [ ] {arquivo}: {descrição}
-
-### 3.4 Componentes Livewire
-- [ ] {arquivo}: {descrição}
-
-### 3.5 UI com Flux
-- [ ] {arquivo}: {descrição}
-
-## 4. Skills a Ativar
-- [ ] livewire-development: {sim/não - motivo}
-- [ ] fluxui-development: {sim/não - motivo}
-- [ ] tailwindcss-development: {sim/não - motivo}
-- [ ] pest-testing: sim (obrigatório)
-- [ ] developing-with-fortify: {sim/não - motivo}
-- [ ] mcp-development: {sim/não - motivo}
-
-## 5. Testes Necessários
-- [ ] {teste 1}
-- [ ] {teste 2}
-
-## 6. Riscos e Dependências
-- {risco ou dependência identificada}
-```
-
-### Critérios para Ativar Skills
-
-| Skill | Quando ativar |
-|-------|---------------|
-| `livewire-development` | Componentes reativos, wire:, real-time |
-| `fluxui-development` | Modal, form, input, button, table, chart, UI components |
-| `tailwindcss-development` | Layout, grid, flex, dark mode, responsive, estilizacao |
-| `pest-testing` | **Sempre obrigatorio** |
-| `developing-with-fortify` | Auth, login, registro, 2FA, password |
-| `mcp-development` | Tools MCP, resources, prompts, routes/ai |
-
-### Passo 3: Solicitar Aprovação
-
-Após preencher o template do plano, chamar a ferramenta `ExitPlanMode` para solicitar aprovação do usuário:
+### Chamada do Agente
 
 ```
-Ferramenta: ExitPlanMode
-Parâmetros: {} (nenhum parâmetro necessário)
+Ferramenta: Task
+Parâmetros:
+  subagent_type: "Plan"
+  description: "Planejar implementação da task {ID}"
+  prompt: |
+    ## Contexto da Task
+    - Task ID: {id}
+    - Título: {titulo}
+    - Descrição: {descricao completa da task}
+    - Session Prompt: {session_prompt se existir}
+    - Documentos consultados: {lista de docs lidos na fase 1}
+
+    ## Workflow de Implementação
+    Este projeto segue um workflow Laravel com a seguinte ordem de implementação:
+    1. Migration + Model (casts, relationships, scopes)
+    2. Policy / Authorization (gates e policies)
+    3. Action / Service (lógica de negócio isolada)
+    4. Componentes Livewire
+    5. UI com Flux
+
+    ## Skills Disponíveis
+    - livewire-development: Componentes reativos, wire:, real-time
+    - fluxui-development: Modal, form, input, button, table, chart, UI components
+    - tailwindcss-development: Layout, grid, flex, dark mode, responsive
+    - pest-testing: SEMPRE obrigatório
+    - developing-with-fortify: Auth, login, registro, 2FA, password
+    - mcp-development: Tools MCP, resources, prompts, routes/ai
+
+    ## Sua Tarefa
+    Explorar o codebase e criar um plano de implementação seguindo este template:
+
+    # Plano: {titulo-da-task}
+
+    ## 1. Contexto
+    - Task ID: {id}
+    - Descrição: {resumo}
+    - Documentos consultados: {lista}
+
+    ## 2. Análise do Código Existente
+    - Models relacionados: {lista com paths}
+    - Componentes Livewire: {lista}
+    - Policies/Gates: {lista}
+    - Migrations relevantes: {lista}
+
+    ## 3. Arquitetura Proposta
+
+    ### 3.1 Migration + Model
+    - [ ] {arquivo}: {descrição}
+
+    ### 3.2 Policy / Authorization
+    - [ ] {arquivo}: {descrição}
+
+    ### 3.3 Action / Service
+    - [ ] {arquivo}: {descrição}
+
+    ### 3.4 Componentes Livewire
+    - [ ] {arquivo}: {descrição}
+
+    ### 3.5 UI com Flux
+    - [ ] {arquivo}: {descrição}
+
+    ## 4. Skills a Ativar
+    - [ ] livewire-development: {sim/não - motivo}
+    - [ ] fluxui-development: {sim/não - motivo}
+    - [ ] tailwindcss-development: {sim/não - motivo}
+    - [ ] pest-testing: sim (obrigatório)
+    - [ ] developing-with-fortify: {sim/não - motivo}
+    - [ ] mcp-development: {sim/não - motivo}
+
+    ## 5. Testes Necessários
+    - [ ] {teste 1}
+    - [ ] {teste 2}
+
+    ## 6. Riscos e Dependências
+    - {risco ou dependência identificada}
 ```
 
-O usuário revisará o plano e aprovará ou solicitará ajustes.
+### Após Retorno do Agente
 
-### Passo 4: Registrar no SoloBoard
-
-Após aprovação do plano, registrar no SoloBoard:
+1. Revisar o plano retornado pelo agente
+2. Apresentar ao usuário para aprovação
+3. Após aprovação, registrar no SoloBoard:
 
 ```
 add-to-plan task_id={ID} description="Resumo do plano aprovado"
