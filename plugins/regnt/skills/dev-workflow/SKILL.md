@@ -1,6 +1,6 @@
 ---
 name: dev-workflow
-description: Workflow estruturado de desenvolvimento para implementar tasks do SoloBoard. Orquestra 5 fases (Intake, Planejamento, Implementacao, Qualidade, Entrega) com integracao ao SoloBoard MCP (timers, tasks, documentos, plano do dia). Usar quando receber o contexto do prompt `development-workflow` com task_id, ou quando o usuario pedir para implementar/desenvolver uma task do SoloBoard. Ativa automaticamente skills complementares (livewire, fluxui, pest-testing, tailwindcss, fortify, mcp) conforme a natureza da task.
+description: Workflow estruturado de desenvolvimento para implementar tasks do SoloBoard. Orquestra 5 fases (Intake, Planejamento, Implementacao, Qualidade, Entrega) com integracao ao SoloBoard MCP (timers, tasks, documentos, plano do dia). Usar quando receber o contexto do prompt `development-workflow` com task_id, ou quando o usuario pedir para implementar/desenvolver uma task do SoloBoard. Pode delegar UI para o agente frontend-laravel e usar skills do Laravel Boost quando disponíveis.
 ---
 
 # Development Workflow
@@ -63,7 +63,12 @@ Parâmetros:
     4. Componentes Livewire
     5. UI com Flux
 
-    ## Skills Disponíveis
+    ## Recursos Disponíveis
+
+    ### Agentes do Plugin regnt
+    - frontend-laravel: Especialista em Livewire 4, Flux UI e Blade (delegar implementação de UI)
+
+    ### Skills do Laravel Boost (se instalado)
     - livewire-development: Componentes reativos, wire:, real-time
     - fluxui-development: Modal, form, input, button, table, chart, UI components
     - tailwindcss-development: Layout, grid, flex, dark mode, responsive
@@ -104,10 +109,12 @@ Parâmetros:
     ### 3.5 UI com Flux
     - [ ] {arquivo}: {descrição}
 
-    ## 4. Skills a Ativar
-    - [ ] livewire-development: {sim/não - motivo}
-    - [ ] fluxui-development: {sim/não - motivo}
-    - [ ] tailwindcss-development: {sim/não - motivo}
+    ## 4. Recursos a Utilizar
+
+    ### Agentes
+    - [ ] frontend-laravel: {sim/não - delegar UI para este agente}
+
+    ### Skills Laravel Boost
     - [ ] pest-testing: sim (obrigatório)
     - [ ] developing-with-fortify: {sim/não - motivo}
     - [ ] mcp-development: {sim/não - motivo}
