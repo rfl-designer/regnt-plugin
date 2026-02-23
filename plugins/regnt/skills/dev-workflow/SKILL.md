@@ -38,7 +38,21 @@ Depois:
 
 ## Fase 2: Planejamento
 
-Usar `EnterPlanMode` para criar plano estruturado seguindo o template abaixo.
+### Passo 1: Entrar no Plan Mode
+
+Chamar a ferramenta `EnterPlanMode` para iniciar o modo de planejamento estruturado:
+
+```
+Ferramenta: EnterPlanMode
+Parâmetros: {} (nenhum parâmetro necessário)
+```
+
+O Plan Mode permite explorar o codebase sistematicamente usando Glob, Grep e Read antes de implementar.
+
+### Passo 2: Explorar e Documentar
+
+Dentro do Plan Mode, explorar o código existente e criar o plano seguindo o template abaixo.
+O plano será salvo em um arquivo (por padrão em `~/.claude/plans/` ou conforme `plansDirectory` nas settings).
 
 ### Template do Plano
 
@@ -100,9 +114,20 @@ Usar `EnterPlanMode` para criar plano estruturado seguindo o template abaixo.
 | `developing-with-fortify` | Auth, login, registro, 2FA, password |
 | `mcp-development` | Tools MCP, resources, prompts, routes/ai |
 
-### Após Aprovação do Plano
+### Passo 3: Solicitar Aprovação
 
-Ao sair do Plan Mode (`ExitPlanMode`), registrar no SoloBoard:
+Após preencher o template do plano, chamar a ferramenta `ExitPlanMode` para solicitar aprovação do usuário:
+
+```
+Ferramenta: ExitPlanMode
+Parâmetros: {} (nenhum parâmetro necessário)
+```
+
+O usuário revisará o plano e aprovará ou solicitará ajustes.
+
+### Passo 4: Registrar no SoloBoard
+
+Após aprovação do plano, registrar no SoloBoard:
 
 ```
 add-to-plan task_id={ID} description="Resumo do plano aprovado"
