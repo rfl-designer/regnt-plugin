@@ -24,7 +24,7 @@ Adicione ao seu `~/.claude/settings.json`:
         "hooks": [
           {
             "type": "command",
-            "command": "$HOME/.claude/plugins/regnt/hooks/orchestrator.sh"
+            "command": "$HOME/.claude/plugins/marketplaces/regnt-marketplace/plugins/regnt/hooks/orchestrator.sh"
           }
         ]
       }
@@ -35,15 +35,14 @@ Adicione ao seu `~/.claude/settings.json`:
 
 ### Variaveis de Ambiente
 
-O script usa estas variaveis (definidas pelo Claude Code):
+O script usa esta variavel (definida pelo Claude Code):
 
 - `CLAUDE_PROJECT_DIR`: Diretorio do projeto atual
-- `CLAUDE_PLUGINS_DIR`: Diretorio de plugins (default: `~/.claude/plugins`)
 
 ### Testando
 
 ```bash
 # Simula as variaveis e executa
 CLAUDE_PROJECT_DIR=/path/to/your/project \
-  ~/.claude/plugins/regnt/hooks/orchestrator.sh
+  ~/.claude/plugins/marketplaces/regnt-marketplace/plugins/regnt/hooks/orchestrator.sh
 ```

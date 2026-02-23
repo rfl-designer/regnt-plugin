@@ -1,7 +1,7 @@
 #!/bin/bash
 # Orchestrator Hook - Injeta contexto no inicio da sessao
 
-PLUGIN_DIR="$HOME/.claude/plugins/regnt"
+PLUGIN_DIR="$HOME/.claude/plugins/marketplaces/regnt-marketplace/plugins/regnt"
 
 if [ ! -d "$PLUGIN_DIR" ]; then
   echo "Plugin regnt nao encontrado em $PLUGIN_DIR"
