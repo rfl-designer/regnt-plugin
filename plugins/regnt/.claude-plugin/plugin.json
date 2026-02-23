@@ -1,5 +1,5 @@
 {
   "name": "regnt",
-  "description": "Plugin com skills, workflows e agentes para desenvolvimento com o SoloBoard. Skills: dev-workflow, write-prd, prd-to-tasks. Agentes: frontend-laravel (especialista em Livewire 4, Flux UI e Blade).",
+  "description": "Plugin com skills, workflows e agentes para desenvolvimento com o SoloBoard. Skills: dev-workflow, write-prd, prd-to-tasks. Agentes: frontend-laravel (Livewire 4, Flux UI, Blade), ai-workflows (Laravel AI SDK, Laravel MCP).",
   "version": "1.2.0"
 }
