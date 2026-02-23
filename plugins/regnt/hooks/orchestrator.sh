@@ -1,13 +1,11 @@
 #!/bin/bash
 # Orchestrator Hook - Injeta contexto no inicio da sessao
-# Instalacao: Copiar para ~/.claude/hooks/ e configurar em settings.json
 
-# Detecta diretorio do plugin
-PLUGIN_DIR="${CLAUDE_PLUGINS_DIR:-$HOME/.claude/plugins}/regnt"
+PLUGIN_DIR="$HOME/.claude/plugins/regnt"
 
-# Fallback se nao encontrar
 if [ ! -d "$PLUGIN_DIR" ]; then
-  PLUGIN_DIR="$(dirname "$(dirname "$(realpath "$0")")")"
+  echo "Plugin regnt nao encontrado em $PLUGIN_DIR"
+  exit 0
 fi
 
 echo "<!-- orchestrator-context -->"
