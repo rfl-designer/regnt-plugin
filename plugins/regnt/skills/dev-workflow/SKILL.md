@@ -38,10 +38,58 @@ Depois:
 
 ## Fase 2: Planejamento
 
-1. Explorar codigo existente relevante (Models, Policies, Migrations, Componentes Livewire)
-2. Definir arquitetura: quais arquivos criar/modificar
-3. Registrar no plano do dia: `add-to-plan`
-4. Identificar skills necessarias pela natureza da task:
+Usar `EnterPlanMode` para criar plano estruturado seguindo o template abaixo.
+
+### Template do Plano
+
+```markdown
+# Plano: {titulo-da-task}
+
+## 1. Contexto
+- Task ID: {id}
+- Descrição: {resumo da task}
+- Documentos consultados: {lista de docs lidos}
+
+## 2. Análise do Código Existente
+- Models relacionados: {lista com paths}
+- Componentes Livewire: {lista}
+- Policies/Gates: {lista}
+- Migrations relevantes: {lista}
+
+## 3. Arquitetura Proposta
+
+### 3.1 Migration + Model
+- [ ] {arquivo}: {descrição do que criar/modificar}
+
+### 3.2 Policy / Authorization
+- [ ] {arquivo}: {descrição}
+
+### 3.3 Action / Service
+- [ ] {arquivo}: {descrição}
+
+### 3.4 Componentes Livewire
+- [ ] {arquivo}: {descrição}
+
+### 3.5 UI com Flux
+- [ ] {arquivo}: {descrição}
+
+## 4. Skills a Ativar
+- [ ] livewire-development: {sim/não - motivo}
+- [ ] fluxui-development: {sim/não - motivo}
+- [ ] tailwindcss-development: {sim/não - motivo}
+- [ ] pest-testing: sim (obrigatório)
+- [ ] developing-with-fortify: {sim/não - motivo}
+- [ ] mcp-development: {sim/não - motivo}
+
+## 5. Testes Necessários
+- [ ] {teste 1}
+- [ ] {teste 2}
+
+## 6. Riscos e Dependências
+- {risco ou dependência identificada}
+```
+
+### Critérios para Ativar Skills
 
 | Skill | Quando ativar |
 |-------|---------------|
@@ -51,6 +99,14 @@ Depois:
 | `pest-testing` | **Sempre obrigatorio** |
 | `developing-with-fortify` | Auth, login, registro, 2FA, password |
 | `mcp-development` | Tools MCP, resources, prompts, routes/ai |
+
+### Após Aprovação do Plano
+
+Ao sair do Plan Mode (`ExitPlanMode`), registrar no SoloBoard:
+
+```
+add-to-plan task_id={ID} description="Resumo do plano aprovado"
+```
 
 ## Fase 3: Implementacao
 
