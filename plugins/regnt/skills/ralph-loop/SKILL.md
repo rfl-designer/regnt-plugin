@@ -95,6 +95,25 @@ Criar os arquivos em `storage/ralph/`:
 
 You are an autonomous coding agent working on a software project.
 
+## Load Required Skills (FIRST STEP)
+
+Before starting any implementation, load the development skills by invoking these slash commands:
+
+```
+/regnt:laravel-development
+/regnt:php-development
+/regnt:pest-tester
+/regnt:pint-formatting
+```
+
+These skills provide:
+- **laravel-development**: Laravel 12 conventions, controllers, models, migrations, Form Requests
+- **php-development**: Modern PHP 8.x patterns, typing, enums, constructors
+- **pest-tester**: Writing feature and unit tests with Pest PHP
+- **pint-formatting**: Code formatting with Laravel Pint
+
+**IMPORTANT**: Load these skills at the START of each iteration before reading the PRD.
+
 ## Your Task
 
 ### Initial Check (once per session)
@@ -104,20 +123,21 @@ You are an autonomous coding agent working on a software project.
 
 ### Per User Story
 
-1. Read the PRD at `storage/ralph/prd.json`
-2. Read the progress log at `storage/ralph/progress.txt` (check Codebase Patterns section first)
-3. Pick the **highest priority** user story where `passes: false`
-4. Start timer via SoloBoard MCP: `start-timer` with the `task_id` from `metadata.soloboard_task_id`
-5. Update status via SoloBoard MCP: `update-task` with `task_id` and `status=doing`
-6. Implement that **single** user story
-7. Run quality checks: `php artisan test --compact` and `vendor/bin/pint --dirty`
-8. If checks pass, commit ALL changes with message: `feat: [Story ID] - [Story Title]`
-9. Update SoloBoard via MCP:
-   - `update-task` with `task_id`, `status=done`, and `session_result` describing what was implemented
-   - `stop-timer` with `task_id` and `notes` summarizing work done
-10. Update `storage/ralph/prd.json` to set `passes: true` for the completed story
-11. Append your progress to `storage/ralph/progress.txt`
-12. **If this was the LAST user story** (all stories now have `passes: true`):
+1. Load required skills: `/regnt:laravel-development`, `/regnt:php-development`, `/regnt:pest-tester`, `/regnt:pint-formatting`
+2. Read the PRD at `storage/ralph/prd.json`
+3. Read the progress log at `storage/ralph/progress.txt` (check Codebase Patterns section first)
+4. Pick the **highest priority** user story where `passes: false`
+5. Start timer via SoloBoard MCP: `start-timer` with the `task_id` from `metadata.soloboard_task_id`
+6. Update status via SoloBoard MCP: `update-task` with `task_id` and `status=doing`
+7. Implement that **single** user story
+8. Run quality checks: `php artisan test --compact` and `vendor/bin/pint --dirty`
+9. If checks pass, commit ALL changes with message: `feat: [Story ID] - [Story Title]`
+10. Update SoloBoard via MCP:
+    - `update-task` with `task_id`, `status=done`, and `session_result` describing what was implemented
+    - `stop-timer` with `task_id` and `notes` summarizing work done
+11. Update `storage/ralph/prd.json` to set `passes: true` for the completed story
+12. Append your progress to `storage/ralph/progress.txt`
+13. **If this was the LAST user story** (all stories now have `passes: true`):
     - Update feature status: `update-feature` with `feature_id` and move feature to `done`
 
 ## Progress Report Format
