@@ -33,7 +33,22 @@ O Ralph Loop e um sistema de automacao que:
 
 Ao receber `/ralph <feature_id>`:
 
-### 1.1 Buscar dados da Feature
+### 1.1 Arquivar sessao anterior (se existir)
+
+Se existirem arquivos em `storage/ralph/` (prd.json, CLAUDE.md, progress.txt), mover para archive:
+
+```bash
+# Criar pasta de archive com timestamp
+ARCHIVE_DIR="storage/ralph/archive/$(date +%Y%m%d_%H%M%S)"
+mkdir -p "$ARCHIVE_DIR"
+
+# Mover arquivos existentes
+mv storage/ralph/prd.json "$ARCHIVE_DIR/" 2>/dev/null || true
+mv storage/ralph/CLAUDE.md "$ARCHIVE_DIR/" 2>/dev/null || true
+mv storage/ralph/progress.txt "$ARCHIVE_DIR/" 2>/dev/null || true
+```
+
+### 1.2 Buscar dados da Feature
 
 ```
 ralph-export feature_id={ID} max_iterations={N}
@@ -42,7 +57,7 @@ get-feature feature_id={ID}
 
 O `ralph-export` retorna o PRD JSON. O `get-feature` retorna detalhes da feature (titulo, projeto, tasks).
 
-### 1.2 Criar estrutura local
+### 1.3 Criar estrutura local
 
 Criar os arquivos em `storage/ralph/`:
 
@@ -82,6 +97,13 @@ You are an autonomous coding agent working on a software project.
 
 ## Your Task
 
+### Initial Check (once per session)
+
+1. Check feature status via SoloBoard MCP: `get-feature` with `feature_id` from prd.json
+2. If feature status is NOT `doing`, update it: `update-feature` with `feature_id` and `status=doing` (this signals work has started)
+
+### Per User Story
+
 1. Read the PRD at `storage/ralph/prd.json`
 2. Read the progress log at `storage/ralph/progress.txt` (check Codebase Patterns section first)
 3. Pick the **highest priority** user story where `passes: false`
@@ -95,6 +117,8 @@ You are an autonomous coding agent working on a software project.
    - `stop-timer` with `task_id` and `notes` summarizing work done
 10. Update `storage/ralph/prd.json` to set `passes: true` for the completed story
 11. Append your progress to `storage/ralph/progress.txt`
+12. **If this was the LAST user story** (all stories now have `passes: true`):
+    - Update feature status: `update-feature` with `feature_id` and move feature to `done`
 
 ## Progress Report Format
 
@@ -127,8 +151,9 @@ If you discover a **reusable pattern**, add it to the `## Codebase Patterns` sec
 
 After completing a user story, check if ALL stories have `passes: true`.
 
-If ALL stories are complete and passing, reply with:
-<promise>COMPLETE</promise>
+If ALL stories are complete and passing:
+1. Update feature status via SoloBoard MCP: `update-feature` with `feature_id` to move feature to `done`
+2. Reply with: <promise>COMPLETE</promise>
 
 **If there are still stories with `passes: false`, end your response normally.** Another iteration will pick up the next story. Do NOT implement multiple stories in one iteration.
 
@@ -148,6 +173,8 @@ If ALL stories are complete and passing, reply with:
 
 | Tool | Purpose |
 |------|---------|
+| `get-feature` | Get feature details and current status |
+| `update-feature` | Update feature status (`doing`, `done`) |
 | `start-timer` | Start timer for a task (`task_id` param) |
 | `stop-timer` | Stop timer with optional `notes` |
 | `update-task` | Update task `status`, `session_result` |
@@ -251,14 +278,14 @@ echo "=== Max iterations (${MAX_ITERATIONS}) reached. ==="
 exit 1
 ```
 
-### 1.3 Criar branch
+### 1.4 Criar branch
 
 ```bash
 git checkout main && git pull
 git checkout -b ralph/{feature-slug}
 ```
 
-### 1.4 Confirmar setup
+### 1.5 Confirmar setup
 
 Mostrar ao usuario:
 - Feature: {titulo}
@@ -338,6 +365,7 @@ Se uma story esta bloqueada, o loop adiciona `blockedReason` no prd.json e conti
 |------|-----|
 | `ralph-export` | Exportar feature como PRD |
 | `get-feature` | Detalhes da feature |
+| `update-feature` | Atualizar status da feature (doing/done) |
 | `list-features` | Listar features disponiveis |
 | `start-timer` | Iniciar timer para task |
 | `stop-timer` | Parar timer com notas |
