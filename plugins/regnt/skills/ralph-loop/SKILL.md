@@ -129,9 +129,17 @@ These skills provide:
 4. Pick the **highest priority** user story where `passes: false`
 5. Start timer via SoloBoard MCP: `start-timer` with the `task_id` from `metadata.soloboard_task_id`
 6. Update status via SoloBoard MCP: `update-task` with `task_id` and `status=doing`
-7. Implement that **single** user story
+7. Implement that **single** user story following the Laravel implementation order:
+   1. **Migration + Model** — casts, relationships, scopes → `/regnt:laravel-development` + `laravel-core` agent
+   2. **Policy** — gates e policies (se necessario) → `/regnt:laravel-development` + `laravel-core` agent
+   3. **Action** — logica de negocio isolada → `/regnt:php-development`
+   4. **Livewire** — componentes reativos → `frontend-laravel` agent (tem skills livewire/fluxui/tailwind)
+   5. **UI** — views com Flux → `frontend-laravel` agent
+   6. **Testes** — feature/unit tests → `pest-tester` agent
+   - Fazer commits incrementais a cada camada relevante: `feat: [Story ID] - [layer description]`
+   - Delegar para agents especializados quando apropriado (ver tabela abaixo)
 8. Run quality checks: `php artisan test --compact` and `vendor/bin/pint --dirty`
-9. If checks pass, commit ALL changes with message: `feat: [Story ID] - [Story Title]`
+9. If checks pass and there are uncommitted changes, commit: `feat: [Story ID] - [Story Title]`
 10. Update SoloBoard via MCP:
     - `update-task` with `task_id`, `status=done`, and `session_result` describing what was implemented
     - `stop-timer` with `task_id` and `notes` summarizing work done
@@ -139,6 +147,29 @@ These skills provide:
 12. Append your progress to `storage/ralph/progress.txt`
 13. **If this was the LAST user story** (all stories now have `passes: true`):
     - Update feature status: `update-feature` with `feature_id` and move feature to `done`
+
+## Agents e Skills Disponiveis
+
+Delegar quando apropriado:
+
+### Agents (subagent_type)
+
+| Agent | Quando usar |
+|-------|-------------|
+| `regnt:laravel-core` | Models, Migrations, Factories, Seeders, Enums, DTOs, Policies, Form Requests, Observers, Events |
+| `regnt:frontend-laravel` | Livewire 4, Flux UI, Blade views, componentes interativos, TALL stack |
+| `regnt:pest-tester` | Feature tests, unit tests, browser tests, testes Livewire |
+| `regnt:ai-workflows` | Laravel AI SDK, Laravel MCP, agents, tools, structured output, embeddings |
+| `laravel-simplifier` | Revisar e simplificar codigo PHP/Laravel antes de entregar |
+
+### Skills (invocar com /regnt:nome)
+
+| Skill | Quando usar |
+|-------|-------------|
+| `/regnt:laravel-development` | Conventions Laravel 12 — controllers, models, migrations, Form Requests |
+| `/regnt:php-development` | PHP 8.x moderno — tipagem, enums, constructors, PHPDoc |
+| `/regnt:pint-formatting` | Formatacao com Laravel Pint apos modificar PHP |
+| `/regnt:boost-tools` | Debug, consultar DB, executar Artisan, buscar docs, gerar URLs |
 
 ## Progress Report Format
 
