@@ -9,15 +9,28 @@ description: |
 
 # Ralph Loop
 
-Loop autonomo de desenvolvimento que implementa user stories de uma Feature do SoloBoard.
+Loop autonomo de desenvolvimento que implementa user stories de uma Feature do SoloBoard, uma por vez, com disciplina TDD e verificacao rigorosa.
 
-## O que e o Ralph Loop?
+**Core principle:** ONE story per iteration. TDD always. Verify before claiming. Never skip quality gates.
 
-O Ralph Loop e um sistema de automacao que:
-1. Pega uma Feature do SoloBoard com suas tasks (user stories)
-2. Implementa cada story uma por vez, de forma autonoma
-3. Roda testes, faz commits, atualiza status no SoloBoard
-4. Repete ate todas as stories estarem completas
+## The Iron Law
+
+```
+NO STORY IS COMPLETE WITHOUT FRESH VERIFICATION EVIDENCE
+```
+
+If you haven't run `php artisan test --compact` AND `vendor/bin/pint --dirty` in this iteration, you CANNOT mark the story as passing. No exceptions.
+
+## When to Use
+
+**Always:**
+- Implementing a SoloBoard Feature with multiple tasks/stories
+- User mentions "ralph", "loop autonomo", "implementar feature"
+- Feature has 2+ user stories that need sequential implementation
+
+**Never:**
+- Single task → use `regnt:dev-workflow` instead
+- No SoloBoard feature → use `regnt:executing-plans` instead
 
 ## Comando
 
@@ -29,20 +42,62 @@ O Ralph Loop e um sistema de automacao que:
 - `--max-iterations`: Maximo de iteracoes (default: 10)
 - `--run`: Iniciar o loop imediatamente apos setup
 
-## Fase 1: Setup
+## Process Flow
 
-Ao receber `/ralph <feature_id>`:
+```dot
+digraph ralph_loop {
+    rankdir=TB;
+
+    setup [label="Phase 1: Setup\nArchive → Fetch → Create files → Branch", shape=box];
+    load_skills [label="Load Skills\nlaravel-development, php-development\npint-formatting, test-driven-development", shape=box];
+    read_prd [label="Read PRD + Progress\n(check Codebase Patterns first)", shape=box];
+    pick_story [label="Pick highest priority\nstory with passes: false", shape=box];
+    any_pending [label="Stories pending?" shape=diamond];
+    start_timer [label="Start timer\nupdate-task → doing", shape=box];
+    implement [label="Implement story\nTDD: RED → GREEN → REFACTOR\nLaravel order", shape=box];
+    quality_gate [label="Quality Gate\nphp artisan test --compact\nvendor/bin/pint --dirty", shape=box, style=filled, fillcolor="#ffcccc"];
+    passes [label="All checks pass?" shape=diamond];
+    fix [label="Fix issues\n(use regnt:systematic-debugging\nif 2+ attempts fail)", shape=box];
+    commit [label="Commit + Update SoloBoard\nstop-timer, update-task → done", shape=box];
+    update_prd [label="Update prd.json\npasses: true", shape=box];
+    log_progress [label="Append to progress.txt\nConsolidate patterns", shape=box];
+    all_done [label="ALL stories pass?" shape=diamond];
+    complete [label="COMPLETE\nupdate-feature → done", shape=doublecircle];
+    stop [label="STOP\nEnd iteration\n(next iteration picks up)", shape=doublecircle];
+
+    setup -> load_skills;
+    load_skills -> read_prd;
+    read_prd -> pick_story;
+    pick_story -> any_pending;
+    any_pending -> start_timer [label="yes"];
+    any_pending -> complete [label="no"];
+    start_timer -> implement;
+    implement -> quality_gate;
+    quality_gate -> passes;
+    passes -> commit [label="yes"];
+    passes -> fix [label="no"];
+    fix -> quality_gate;
+    commit -> update_prd;
+    update_prd -> log_progress;
+    log_progress -> all_done;
+    all_done -> complete [label="yes"];
+    all_done -> stop [label="no — ONE story per iteration"];
+}
+```
+
+---
+
+## Phase 1: Setup
+
+**Announce:** "I'm using the ralph-loop skill to set up autonomous feature implementation."
 
 ### 1.1 Arquivar sessao anterior (se existir)
 
 Se existirem arquivos em `storage/ralph/` (prd.json, CLAUDE.md, progress.txt), mover para archive:
 
 ```bash
-# Criar pasta de archive com timestamp
 ARCHIVE_DIR="storage/ralph/archive/$(date +%Y%m%d_%H%M%S)"
 mkdir -p "$ARCHIVE_DIR"
-
-# Mover arquivos existentes
 mv storage/ralph/prd.json "$ARCHIVE_DIR/" 2>/dev/null || true
 mv storage/ralph/CLAUDE.md "$ARCHIVE_DIR/" 2>/dev/null || true
 mv storage/ralph/progress.txt "$ARCHIVE_DIR/" 2>/dev/null || true
@@ -95,126 +150,156 @@ Criar os arquivos em `storage/ralph/`:
 
 You are an autonomous coding agent working on a software project.
 
-## Load Required Skills (FIRST STEP)
+## Load Required Skills (MANDATORY FIRST STEP)
 
-Before starting any implementation, load the development skills by invoking these slash commands:
+Before ANY implementation, load these skills by invoking:
 
 ```
 /regnt:laravel-development
 /regnt:php-development
-/regnt:pest-tester
+/regnt:test-driven-development
 /regnt:pint-formatting
 ```
 
-These skills provide:
-- **laravel-development**: Laravel 12 conventions, controllers, models, migrations, Form Requests
-- **php-development**: Modern PHP 8.x patterns, typing, enums, constructors
-- **pest-tester**: Writing feature and unit tests with Pest PHP
-- **pint-formatting**: Code formatting with Laravel Pint
+**IMPORTANT**: Load at the START of each iteration. No exceptions.
 
-**IMPORTANT**: Load these skills at the START of each iteration before reading the PRD.
+## Discipline Skills (ALWAYS ACTIVE)
+
+These discipline rules apply to EVERY action you take:
+
+- **regnt:test-driven-development** — NO production code without a failing test first
+- **regnt:verification-before-completion** — NO completion claims without fresh evidence
+- **regnt:systematic-debugging** — NO fixes without root cause investigation first
 
 ## Your Task
 
 ### Initial Check (once per session)
 
-1. Check feature status via SoloBoard MCP: `get-feature` with `feature_id` from prd.json
-2. If feature status is NOT `doing`, update it: `update-feature` with `feature_id` and `status=doing` (this signals work has started)
+1. Check feature status: `get-feature` with `feature_id` from prd.json
+2. If feature status is NOT `doing`, update: `update-feature` with `status=doing`
 
 ### Per User Story
 
-1. Load required skills: `/regnt:laravel-development`, `/regnt:php-development`, `/regnt:pest-tester`, `/regnt:pint-formatting`
-2. Read the PRD at `storage/ralph/prd.json`
-3. Read the progress log at `storage/ralph/progress.txt` (check Codebase Patterns section first)
-4. Pick the **highest priority** user story where `passes: false`
-5. Start timer via SoloBoard MCP: `start-timer` with the `task_id` from `metadata.soloboard_task_id`
-6. Update status via SoloBoard MCP: `update-task` with `task_id` and `status=doing`
-7. Implement that **single** user story following the Laravel implementation order:
-   1. **Migration + Model** — casts, relationships, scopes → `/regnt:laravel-development` + `laravel-core` agent
-   2. **Policy** — gates e policies (se necessario) → `/regnt:laravel-development` + `laravel-core` agent
-   3. **Action** — logica de negocio isolada → `/regnt:php-development`
-   4. **Livewire** — componentes reativos → `frontend-laravel` agent (tem skills livewire/fluxui/tailwind)
-   5. **UI** — views com Flux → `frontend-laravel` agent
-   6. **Testes** — feature/unit tests → `pest-tester` agent
-   - Fazer commits incrementais a cada camada relevante: `feat: [Story ID] - [layer description]`
-   - Delegar para agents especializados quando apropriado (ver tabela abaixo)
-8. Run quality checks: `php artisan test --compact` and `vendor/bin/pint --dirty`
-9. If checks pass and there are uncommitted changes, commit: `feat: [Story ID] - [Story Title]`
-10. Update SoloBoard via MCP:
-    - `update-task` with `task_id`, `status=done`, and `session_result` describing what was implemented
-    - `stop-timer` with `task_id` and `notes` summarizing work done
-11. Update `storage/ralph/prd.json` to set `passes: true` for the completed story
-12. Append your progress to `storage/ralph/progress.txt`
-13. **If this was the LAST user story** (all stories now have `passes: true`):
-    - Update feature status: `update-feature` with `feature_id` and move feature to `done`
+1. Read the PRD at `storage/ralph/prd.json`
+2. Read `storage/ralph/progress.txt` (check **Codebase Patterns** section FIRST)
+3. Pick the **highest priority** user story where `passes: false`
+4. Start timer: `start-timer` with `task_id` from `metadata.soloboard_task_id`
+5. Update status: `update-task` with `task_id` and `status=doing`
+6. **Implement using TDD (RED-GREEN-REFACTOR):**
+   For each piece of functionality:
+   a. Write failing test (Pest PHP) — verify it FAILS
+   b. Write minimal code to pass — verify it PASSES
+   c. Refactor — verify still PASSES
+   d. Commit: `feat: [Story ID] - [description]`
+7. Follow **Laravel implementation order**:
+   1. **Migration + Model** — casts, relationships, scopes → `regnt:laravel-core` agent
+   2. **Policy** — authorization (if needed) → `regnt:laravel-core` agent
+   3. **Action** — business logic → `regnt:php-development` skill
+   4. **Livewire** — reactive components → `regnt:frontend-laravel` agent
+   5. **UI** — views with Flux → `regnt:frontend-laravel` agent
+   6. **Tests** — feature/unit → `regnt:pest-tester` agent
+8. **Quality Gate (MANDATORY):**
+   ```bash
+   php artisan test --compact    # ALL tests must pass
+   vendor/bin/pint --dirty       # ALL code must be formatted
+   ```
+   <HARD-GATE>
+   Do NOT proceed if quality checks fail. Fix issues first.
+   If 3+ fix attempts fail → use regnt:systematic-debugging
+   </HARD-GATE>
+9. **Verify before claiming complete:**
+   - Did I RUN `php artisan test --compact`? What was the output?
+   - Did I RUN `vendor/bin/pint --dirty`? What was the output?
+   - Can I show EVIDENCE of both passing?
+   - If NO to any → run them NOW before proceeding
+10. Commit final if uncommitted changes: `feat: [Story ID] - [Story Title]`
+11. Update SoloBoard:
+    - `update-task` with `task_id`, `status=done`, `session_result` describing implementation
+    - `stop-timer` with `task_id` and `notes` summarizing work
+12. Update `storage/ralph/prd.json` → set `passes: true`
+13. Append progress to `storage/ralph/progress.txt`
+14. **If LAST story** (all `passes: true`):
+    - `update-feature` with `feature_id` → `status=done`
 
-## Agents e Skills Disponiveis
+## Agents and Skills
 
-Delegar quando apropriado:
+### Agents (delegate when appropriate)
 
-### Agents (subagent_type)
+| Agent | When |
+|-------|------|
+| `regnt:laravel-core` | Models, Migrations, Factories, Enums, DTOs, Policies |
+| `regnt:frontend-laravel` | Livewire 4, Flux UI, Blade, Alpine.js |
+| `regnt:pest-tester` | Feature tests, unit tests, Livewire tests |
+| `regnt:ai-workflows` | Laravel AI SDK, MCP integration |
+| `laravel-simplifier` | Simplify and review code before delivery |
 
-| Agent | Quando usar |
-|-------|-------------|
-| `regnt:laravel-core` | Models, Migrations, Factories, Seeders, Enums, DTOs, Policies, Form Requests, Observers, Events |
-| `regnt:frontend-laravel` | Livewire 4, Flux UI, Blade views, componentes interativos, TALL stack |
-| `regnt:pest-tester` | Feature tests, unit tests, browser tests, testes Livewire |
-| `regnt:ai-workflows` | Laravel AI SDK, Laravel MCP, agents, tools, structured output, embeddings |
-| `laravel-simplifier` | Revisar e simplificar codigo PHP/Laravel antes de entregar |
+### Skills
 
-### Skills (invocar com /regnt:nome)
-
-| Skill | Quando usar |
-|-------|-------------|
-| `/regnt:laravel-development` | Conventions Laravel 12 — controllers, models, migrations, Form Requests |
-| `/regnt:php-development` | PHP 8.x moderno — tipagem, enums, constructors, PHPDoc |
-| `/regnt:pint-formatting` | Formatacao com Laravel Pint apos modificar PHP |
-| `/regnt:boost-tools` | Debug, consultar DB, executar Artisan, buscar docs, gerar URLs |
+| Skill | When |
+|-------|------|
+| `/regnt:laravel-development` | Laravel 12 conventions |
+| `/regnt:php-development` | PHP 8.x patterns |
+| `/regnt:test-driven-development` | TDD discipline — RED-GREEN-REFACTOR |
+| `/regnt:pint-formatting` | Code formatting |
+| `/regnt:systematic-debugging` | When tests fail after 2+ attempts |
+| `/regnt:verification-before-completion` | Before ANY completion claim |
+| `/regnt:boost-tools` | Debug, DB, Artisan, docs |
 
 ## Progress Report Format
 
-APPEND to storage/ralph/progress.txt (never replace, always append):
+APPEND to storage/ralph/progress.txt (never replace):
 
+```
 ## [Date/Time] - [Story ID]
 - What was implemented
 - Files changed
+- Tests: [count] passing
 - **Learnings for future iterations:**
   - Patterns discovered
   - Gotchas encountered
   - Useful context
 ---
-
-The learnings section is critical — it helps future iterations avoid repeating mistakes.
+```
 
 ## Consolidate Patterns
 
-If you discover a **reusable pattern**, add it to the `## Codebase Patterns` section at the TOP of progress.txt (create it if it doesn't exist). Only add patterns that are **general and reusable**, not story-specific details.
+If you discover a **reusable pattern**, add to `## Codebase Patterns` at TOP of progress.txt.
 
 ## Quality Requirements
 
-- ALL commits must pass quality checks (test, lint)
+- ALL commits must pass quality checks (test + lint)
 - Do NOT commit broken code
-- Keep changes focused and minimal
-- Follow existing code patterns (see CLAUDE.md in project root)
+- Follow TDD: test FIRST, then implement
+- Follow existing code patterns
 - Use conventional commits: `feat:`, `fix:`, `test:`, `chore:`, `refactor:`
 
 ## Stop Condition
 
 After completing a user story, check if ALL stories have `passes: true`.
 
-If ALL stories are complete and passing:
-1. Update feature status via SoloBoard MCP: `update-feature` with `feature_id` to move feature to `done`
+If ALL complete:
+1. `update-feature` with `feature_id` → `status=done`
 2. Reply with: <promise>COMPLETE</promise>
 
-**If there are still stories with `passes: false`, end your response normally.** Another iteration will pick up the next story. Do NOT implement multiple stories in one iteration.
+**If stories remain with `passes: false`, end your response normally.**
+Another iteration picks up the next story.
+
+## Red Flags — STOP
+
+- Implementing without writing test first → STOP, write test
+- Claiming story passes without running `php artisan test` → STOP, run it
+- Fixing test failures without investigating root cause → STOP, use systematic-debugging
+- Implementing multiple stories in one iteration → STOP, one at a time
+- Skipping quality gate because "it should work" → STOP, run the commands
 
 ## Important
 
-- **Work on ONE story per iteration — then STOP**
+- **ONE story per iteration — then STOP**
+- **TDD always — test first, then code**
+- **Verify always — evidence before claims**
 - Commit frequently
 - Keep CI green
-- Read the Codebase Patterns section in progress.txt before starting
-- If a story is blocked, update prd.json with a `blockedReason` field and end your response
+- If story blocked → add `blockedReason` to prd.json, skip to next
 
 ## User Stories
 
@@ -226,7 +311,7 @@ If ALL stories are complete and passing:
 |------|---------|
 | `get-feature` | Get feature details and current status |
 | `update-feature` | Update feature status (`doing`, `done`) |
-| `start-timer` | Start timer for a task (`task_id` param) |
+| `start-timer` | Start timer for a task |
 | `stop-timer` | Stop timer with optional `notes` |
 | `update-task` | Update task `status`, `session_result` |
 | `timer-status` | Check if a timer is running |
@@ -345,27 +430,73 @@ Mostrar ao usuario:
 - Branch: ralph/{slug}
 - Arquivos criados em storage/ralph/
 
-## Fase 2: Executar Loop
+---
 
-Se `--run` foi passado ou usuario confirmar, executar:
+## Phase 2: Execute Loop
+
+Se `--run` foi passado ou usuario confirmar, executar.
+
+### Via Script (modo headless)
 
 ```bash
 ./scripts/ralph.sh --tool claude {max_iterations}
 ```
 
-Ou executar o loop diretamente no Claude Code (sem script bash):
-
-### Loop Direto (Recomendado)
-
-Em vez de usar o script bash, executar o loop dentro do Claude Code:
+### Via Claude Code (modo direto — recomendado)
 
 1. Ler `storage/ralph/prd.json`
 2. Encontrar primeira story com `passes: false`
 3. Se nenhuma: COMPLETE
-4. Executar o workflow da story (timer, implement, test, commit, update)
+4. Executar workflow da story (TDD + Laravel order + quality gate + SoloBoard update)
 5. Atualizar prd.json com `passes: true`
-6. Verificar se ha mais stories pendentes
-7. Se sim: parar e informar usuario (ou continuar se modo autonomo)
+6. **STOP** — uma story por iteracao
+
+---
+
+## Red Flags — STOP and Return to Process
+
+If you catch yourself thinking:
+
+| Thought | Reality |
+|---------|---------|
+| "Skip the test, it's obvious" | TDD is non-negotiable. Write the test first. |
+| "Tests should pass" | "Should" ≠ evidence. Run them. |
+| "I'll write tests after" | Tests-after prove nothing. Delete code, start with test. |
+| "Just implement two stories, they're related" | ONE story per iteration. No exceptions. |
+| "Quality gate passed last time" | Fresh verification every iteration. |
+| "This fix is quick, no need to investigate" | Use systematic-debugging after 2+ failures. |
+| "I'll update SoloBoard later" | Update immediately. Timer + status are part of the process. |
+| "The story is basically done" | "Basically" ≠ "verified". Run quality gate. |
+
+**ALL of these mean: STOP. Follow the process.**
+
+## Common Rationalizations
+
+| Excuse | Reality |
+|--------|---------|
+| "Story too simple for TDD" | Simple code breaks. Test takes 30 seconds. |
+| "Multiple stories are tiny, combine them" | One story per iteration keeps context clean. |
+| "Tests pass, skip Pint" | Pint is part of quality gate. Both or neither. |
+| "Timer overhead slows me down" | Timer tracks real effort. Start it. |
+| "Progress.txt is bureaucracy" | Future iterations depend on your learnings. Write them. |
+
+## Verification Checklist
+
+Before marking ANY story as `passes: true`:
+
+- [ ] Wrote failing tests BEFORE implementation (TDD RED)
+- [ ] Watched tests fail for expected reason
+- [ ] Implemented minimal code to pass (TDD GREEN)
+- [ ] Ran `php artisan test --compact` — **show output with 0 failures**
+- [ ] Ran `vendor/bin/pint --dirty` — **show output with 0 changes**
+- [ ] Committed with conventional commit
+- [ ] Updated SoloBoard: `update-task` + `stop-timer`
+- [ ] Updated prd.json: `passes: true`
+- [ ] Appended to progress.txt with learnings
+
+Can't check all boxes? Story is NOT complete. Do NOT mark as passing.
+
+---
 
 ## Exemplos de Uso
 
@@ -385,30 +516,58 @@ Cria arquivos e inicia o loop autonomo.
 ```
 /ralph 42 --max-iterations=20
 ```
-Permite ate 20 iteracoes.
 
 ### Continuar loop existente
 ```
 ./scripts/ralph.sh 15
 ```
-Continua de onde parou, ate 15 iteracoes.
+
+---
+
+## Integration
+
+**Required skills (loaded every iteration):**
+- **regnt:laravel-development** — Laravel 12 conventions
+- **regnt:php-development** — PHP 8.x patterns
+- **regnt:test-driven-development** — TDD discipline (RED-GREEN-REFACTOR)
+- **regnt:pint-formatting** — Code formatting
+
+**Discipline skills (always active):**
+- **regnt:verification-before-completion** — Evidence before claims
+- **regnt:systematic-debugging** — Root cause before fixes
+
+**Optional skills:**
+- **regnt:boost-tools** — Debug, DB, Artisan
+- **regnt:requesting-code-review** — Review after story (optional)
+
+**Completes with:**
+- **regnt:finishing-a-development-branch** — After all stories pass
+
+---
 
 ## Troubleshooting
 
 ### Feature nao encontrada
-Verifique o ID da feature com `list-features`.
+```
+list-features project_slug={slug}
+```
 
 ### MCP nao conectado
-Certifique-se de ter o SoloBoard MCP configurado:
 ```bash
 claude mcp add --transport http soloboard https://regnt.sophostech.com.br/mcp
 ```
 
-### Testes falhando
-O loop para se testes falham. Corrija manualmente e re-execute.
+### Testes falhando repetidamente
+Use `regnt:systematic-debugging`:
+1. Read error messages carefully
+2. Reproduce with `--filter`
+3. Find root cause
+4. Fix ONE thing at a time
 
 ### Story bloqueada
-Se uma story esta bloqueada, o loop adiciona `blockedReason` no prd.json e continua com a proxima.
+O loop adiciona `blockedReason` no prd.json e pula para a proxima.
+
+---
 
 ## Referencia: Tools MCP
 
@@ -416,7 +575,7 @@ Se uma story esta bloqueada, o loop adiciona `blockedReason` no prd.json e conti
 |------|-----|
 | `ralph-export` | Exportar feature como PRD |
 | `get-feature` | Detalhes da feature |
-| `update-feature` | Atualizar status da feature (doing/done) |
+| `update-feature` | Atualizar status (doing/done) |
 | `list-features` | Listar features disponiveis |
 | `start-timer` | Iniciar timer para task |
 | `stop-timer` | Parar timer com notas |

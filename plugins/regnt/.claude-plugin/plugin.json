@@ -1,5 +1,8 @@
 {
   "name": "regnt",
-  "description": "Plugin com skills, workflows e agentes para desenvolvimento Laravel. Skills: dev-workflow, write-prd, prd-to-tasks, ralph-loop, laravel-development, php-development, pint-formatting, boost-tools. Agentes: frontend-laravel, ai-workflows, laravel-core, pest-tester.",
-  "version": "1.5.0"
+  "description": "Plugin completo para desenvolvimento Laravel com SoloBoard MCP. Skills de processo: using-regnt, brainstorming, writing-plans, executing-plans, subagent-driven-development, test-driven-development, systematic-debugging, requesting-code-review, receiving-code-review, verification-before-completion, finishing-a-development-branch, using-git-worktrees. Skills Laravel: laravel-workflow, dev-workflow, write-prd, prd-to-tasks, ralph-loop, laravel-development, php-development, pint-formatting, boost-tools. Agentes: laravel-core, frontend-laravel, pest-tester, ai-workflows, code-reviewer.",
+  "version": "2.0.0",
+  "skills": "./skills/",
+  "agents": "./agents/",
+  "hooks": "./hooks/hooks.json"
 }
