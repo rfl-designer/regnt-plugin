@@ -51,8 +51,9 @@ digraph when_to_use {
 7. **Mark task complete**
 8. **Update SoloBoard** (if task tracked):
    ```
+   stop-timer task_id={ID} notes="Summary of work done"
    update-task task_id={ID} status=done session_result="What was implemented"
-   stop-timer task_id={ID} notes="Summary"
+   log-commits task_id={ID} commits=[hashes]
    ```
 
 ### After All Tasks:

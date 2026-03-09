@@ -42,10 +42,15 @@ Stop. Don't proceed to Step 2.
 If working on a tracked feature/task:
 
 ```
+# Check timer status first — only stop if still running
+timer-status
+# If timer running: stop-timer task_id={ID} notes="Work completed"
+
 update-feature feature_id={ID} status=done
 update-task task_id={ID} status=done session_result="Summary of implementation"
-stop-timer task_id={ID} notes="Work completed"
 ```
+
+**Note:** The calling skill (dev-workflow, ralph-loop) may have already stopped the timer. Always check `timer-status` first to avoid errors.
 
 ### Step 3: Determine Base Branch
 

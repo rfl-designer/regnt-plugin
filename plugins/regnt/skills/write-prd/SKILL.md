@@ -9,13 +9,19 @@ description: |
 
 # Write PRD
 
-Cria PRDs estruturados através de entrevista colaborativa com o usuário.
+Cria PRDs estruturados através de entrevista colaborativa com o usuário e salva no SoloBoard.
 
 ## Processo
 
 ### 1. Coletar contexto inicial
 
 Pedir ao usuário uma descrição detalhada do problema que quer resolver e ideias iniciais de solução.
+
+Se houver um projeto no SoloBoard, buscar contexto:
+
+```
+get-project-context project_slug={slug}
+```
 
 ### 2. Explorar o codebase
 
@@ -39,7 +45,23 @@ Validar com o usuário:
 
 ### 5. Escrever o PRD
 
-Criar issue GitHub usando o template abaixo.
+Usar o template abaixo.
+
+### 6. Salvar no SoloBoard
+
+Salvar o PRD como documento no projeto:
+
+```
+create-document project_slug={slug} title="PRD: {feature name}" slug="prd-{feature-slug}" content="{PRD completo}"
+```
+
+Se o documento já existir, atualizar:
+
+```
+update-document slug="prd-{feature-slug}" content="{PRD atualizado}"
+```
+
+**Transição:** Sugerir invocar `regnt:prd-to-tasks` para quebrar o PRD em tasks executáveis.
 
 ## Template do PRD
 
@@ -84,3 +106,12 @@ NÃO incluir file paths ou code snippets específicos.
 
 [Notas adicionais relevantes]
 ```
+
+## Referencia: Tools MCP
+
+| Tool | Uso |
+|------|-----|
+| `get-project-context` | Contexto do projeto (docs, features, tasks) |
+| `create-document` | Criar PRD como documento no SoloBoard |
+| `update-document` | Atualizar PRD existente |
+| `list-documents` | Listar documentos do projeto |

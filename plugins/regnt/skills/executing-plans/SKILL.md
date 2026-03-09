@@ -35,7 +35,10 @@ For each task:
 5. Run verifications as specified
 6. Commit incrementally: `feat: [component description]`
 7. Mark as completed
-8. If task has SoloBoard `task_id`: `stop-timer task_id={ID}` and `update-task task_id={ID} status=done`
+8. If task has SoloBoard `task_id`:
+   - `stop-timer task_id={ID} notes="Summary of work done"`
+   - `update-task task_id={ID} status=done session_result="What was implemented"`
+   - `log-commits task_id={ID} commits=[hashes]`
 
 ### Step 3: Quality Gate
 

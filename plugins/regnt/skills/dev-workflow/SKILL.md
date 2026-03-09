@@ -231,10 +231,12 @@ git push -u origin HEAD
 ```
 
 ```
-log-commits task_id={ID} commits=[hash1,hash2] pr_url={URL_if_any}
-update-task task_id={ID} status=done session_result="What was implemented"
 stop-timer task_id={ID} notes="Summary of work"
+update-task task_id={ID} status=done session_result="What was implemented"
+log-commits task_id={ID} commits=[hash1,hash2] pr_url={URL_if_any}
 ```
+
+**Note:** Timer is stopped HERE, before finishing-branch. The finishing-branch skill will check `timer-status` and skip if already stopped.
 
 ### Finishing Branch
 
